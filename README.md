@@ -1,68 +1,62 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Abstract Frontend Interview Project
+It’s our belief at Abstract that there’s no better way to learn how people work together than for people to actually work together. Because of this, we’d like you to complete a small project as part of your interview process.
 
-## Available Scripts
+We will pay you for your work on this, because your effort is worth payment! We pay $125 per hour for interview projects. If this seems unreasonable, please let us know. If you are hired, you’ll see your project bonus on your first paycheck. If not, you’ll receive payment and a 1099 for your work. Please track your hours as a log of what you’ve done and when.
 
-In the project directory, you can run:
+You have one week to complete this project. We’ve worked hard to refine the scope so that it only takes about 8 hours to complete. If you start to think the project will take you longer than 8 hours, please let us know immediately.
 
-### `npm start`
+If you have any questions about the project, please add them as comments in this repo and we’ll reply inline.
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Submitting Your Project
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+Please create a pull request and add **@deetuck-abstract**, **@zpnk**, **@mattsacks**, and **@rickharris** as reviewers when you’re ready to submit your project. We’ll likely ask you some questions on the PR.
 
-### `npm test`
+## The Brief
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+We would like you to build a simple application using JavaScript and React that emulates how a drawing application might render layers. In this case, your application will render what we will refer to as a *Symbol*.
 
-### `npm run build`
+Symbols are defined as JSON objects with a list of `contents`, which can be shapes like Rectangles and Ovals, or other Symbols.
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Each layer in a symbol's `contents` have descriptive attributes. For instance:
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+- Rectangles and Ovals have `width`, `height`, `x`, `y`, and `fill` attributes.
+- Symbols have `x`, `y`, and `scale` attributes.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+You can find a full specification of symbols at the [bottom of this spec](#symbol-specification).
 
-### `npm run eject`
+We will give you a JSON object that defines a list of different symbols, and we'd like you to use that data to build an application with a couple features:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. The user can choose from a dropdown of Symbols to render to the page. When selected, the Symbol will be rendered according to its attributes
+2. Once a Symbol is selected, the app displays a list of its `contents`, and the user can click on one of these items to highlight the portion of the render that it represents.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Here's a demo of how it should work:
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+![FE interview demo](https://user-images.githubusercontent.com/5036362/62641468-7e303700-b8f8-11e9-9faa-fdae5c10d490.gif)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+_Note: This project isn’t a real part of the Abstract product and won’t be shipped, but it is based on some problems we have solved while building the product._
 
-## Learn More
+## Technical Details
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+This repo is based on https://github.com/facebook/create-react-app, and it is initialized with some opinionated settings. Feel free to modify anything to your own preferences.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+To get started, run `npm|yarn install` and `npm|yarn start`, or see the Create React App documentation for more details.
 
-### Code Splitting
+### Fetching Data
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+Symbol data is provided through a function in [`fetchData.js`](src/fetchData.js) — please have your app use this as the initial source for its data. Feel free to transform the data as needed after retrieving it from this API.
 
-### Analyzing the Bundle Size
+### Layer Data Specification
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+The data returned from fetchData is an object with symbol IDs mapped to symbol definitions. You can find all of the test data in [`fetchData.js`](src/fetchData.js).
 
-### Making a Progressive Web App
+Each symbol definition has the following attributes:
+- `width` and `height` are the natural size in pixels of the symbol
+- `contents` defines the internal components of the symbol
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Inside of `contents`:
+- all internal symbols have an `x` and `y` coordinate that represent the position of the symbol relative to the top left corner of the parent symbol’s bounding box at its natural size
+- `type: "rect"` and `type: "oval"` are primitive shape definitions. You can render contents using any web technology of your choosing
+- `fill` is a valid CSS color-code that defines the interior color of a shape
+- shapes will have a `width` and a `height` attribute that represent the width and height of the shape at the natural size of its containing symbol
+- `type: [symbol ID]` is an internal instance of another symbol. This way, symbols can be composed and reused
+- `scale` is the factor by which an internal symbol should be scaled from its natural size
