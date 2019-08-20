@@ -195,13 +195,14 @@ const App = () => {
 
   /**
    * used to open edit or new dialog
-   * @param {boolean} edit 
+   * @param {boolean} edit
    */
   const isDialogOpen = edit => {
     if (!dialogIsOpen) {
       setDialogType(edit);
       if (selectedSymbol === "" && edit) {
         /** they must select from the dropdown to edit */
+        alert("select symbol from dropdown to edit");
         return;
       }
       openDialog(true);
@@ -217,11 +218,12 @@ const App = () => {
 
   /**
    * open and close alert dialog
-   * @param {boolean} isOpen 
+   * @param {boolean} isOpen
    */
   const alertHandler = isOpen => {
     if (selectedSymbol === "") {
       /** they must select from the dropdown to delete */
+      alert("select symbol from dropdown to delete");
       return;
     }
     openAlert(isOpen);
@@ -257,7 +259,11 @@ const App = () => {
         name={selectedSymbol}
         data={data[selectedSymbol]}
       />
-      <CanvasAlertDialog open={alertIsOpen} alertHandler={alertHandler} name={selectedSymbol} />
+      <CanvasAlertDialog
+        open={alertIsOpen}
+        alertHandler={alertHandler}
+        name={selectedSymbol}
+      />
     </div>
   );
 };
