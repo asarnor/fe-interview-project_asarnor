@@ -20,8 +20,8 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 /**
- * 
- * @param {object} props 
+ *
+ * @param {object} props
  */
 const CanvasDropdownContainer = props => {
   const classes = useStyles();

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import CanvasDropdownContainer from "./DropdownSelector/CanvasDropdownContainer";
 import ButtonListContainer from "./ButtonList/ButtonListContainer";
+import CanvasDialog from "./Dialog/CanvasDialog";
+import CanvasAlertDialog from "./Dialog/CanvasAlertDialog";
+import ButtonNav from "./Nav/ButtonNav";
 import fetchData from "./data/fetchData";
 import { Stage, Shape, Container, Shadow } from "@createjs/easeljs";
 
@@ -13,6 +16,9 @@ const App = () => {
   const [selectedSymbol, setSelectedSymbol] = useState("");
   const [selectedHighlight, setHighlight] = useState(null);
   const [_stage, setStage] = useState(null);
+  const [dialogIsOpen, openDialog] = useState(false);
+  const [isEdit, setDialogType] = useState(false);
+  const [alertIsOpen, openAlert] = useState(false);
 
   /**
    * getData gets our data
@@ -27,7 +33,7 @@ const App = () => {
   /**
    * drawSymbol is used to handle root symbols and adds them to the canvas
    * difference between this and nestedSymbol is that this doesnt return a container
-   * @param {string} reference 
+   * @param {string} reference
    */
   const drawSymbol = reference => {
     const container = new Container();
@@ -53,7 +59,9 @@ const App = () => {
           break;
 
         default:
-          container.addChild(drawCustomSymbol(ele.type, ele.scale, ele.x, ele.y));
+          container.addChild(
+            drawCustomSymbol(ele.type, ele.scale, ele.x, ele.y)
+          );
           break;
       }
       container.name = ele.type;
@@ -64,10 +72,10 @@ const App = () => {
   /**
    * drawCustomSymbol is used to handle nested symbols
    * it returns a container that contains nested symbols
-   * @param {string} reference 
-   * @param {number} scale 
-   * @param {number} x 
-   * @param {number} y 
+   * @param {string} reference
+   * @param {number} scale
+   * @param {number} x
+   * @param {number} y
    */
   const drawCustomSymbol = (reference, scale = 1, x = 0, y = 0) => {
     const container = new Container();
@@ -93,7 +101,9 @@ const App = () => {
           break;
 
         default:
-          container.addChild(drawCustomSymbol(ele.type, ele.scale, ele.x, ele.y));
+          container.addChild(
+            drawCustomSymbol(ele.type, ele.scale, ele.x, ele.y)
+          );
           break;
       }
     });
@@ -107,7 +117,7 @@ const App = () => {
   /**
    * setCanvasWidthHeight sets the width and height of canvas dynamically
    * before it renders
-   * @param {string} reference 
+   * @param {string} reference
    */
   const setCanvasWidthHeight = reference => {
     const canvas = document.getElementById("myCanvas");
@@ -115,12 +125,11 @@ const App = () => {
     canvas.height = data[reference].height;
   };
 
-
   /**
    * highlightSymbol is used to capture the index of
    * the selected symbol from the list and highlight it
    * on the canvas
-   * @param {number} idx 
+   * @param {number} idx
    */
   const highlightSymbol = idx => {
     /**
@@ -184,9 +193,49 @@ const App = () => {
     _stage.update();
   };
 
+  /**
+   * used to open edit or new dialog
+   * @param {boolean} edit 
+   */
+  const isDialogOpen = edit => {
+    if (!dialogIsOpen) {
+      setDialogType(edit);
+      if (selectedSymbol === "" && edit) {
+        /** they must select from the dropdown to edit */
+        return;
+      }
+      openDialog(true);
+    }
+  };
+
+  /**
+   * close dialog
+   */
+  const closeDialog = () => {
+    openDialog(false);
+  };
+
+  /**
+   * open and close alert dialog
+   * @param {boolean} isOpen 
+   */
+  const alertHandler = isOpen => {
+    if (selectedSymbol === "") {
+      /** they must select from the dropdown to delete */
+      return;
+    }
+    openAlert(isOpen);
+  };
+
   return (
     <div className="App">
       <header className="App-header">
+        <ButtonNav
+          openDialog={isDialogOpen}
+          openAlert={() => {
+            alertHandler(true);
+          }}
+        />
         <CanvasDropdownContainer
           dropData={dropdownItems}
           setSymbol={symbolSetter}
@@ -201,6 +250,14 @@ const App = () => {
         {(!data || selectedSymbol === "") && <div>No symbol selected...</div>}
         <canvas id="myCanvas" />
       </section>
+      <CanvasDialog
+        open={dialogIsOpen}
+        closeDialog={closeDialog}
+        isEdit={isEdit}
+        name={selectedSymbol}
+        data={data[selectedSymbol]}
+      />
+      <CanvasAlertDialog open={alertIsOpen} alertHandler={alertHandler} name={selectedSymbol} />
     </div>
   );
 };
